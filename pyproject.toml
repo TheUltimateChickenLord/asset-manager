@@ -1,6 +1,6 @@
 [project]
 name = "asset-manager"
-version = "0.2.2"
+version = "0.3.0"
 description = ""
 authors = [
     {name = "TheUltimateChickenLord"}
@@ -32,6 +32,7 @@ pylint = "^3.3.7"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.3.5"
+httpx = "^0.28.1"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

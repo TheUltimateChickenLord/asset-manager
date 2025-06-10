@@ -50,3 +50,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Logs & dbs
+**/logs/
+tests/**/*.db
