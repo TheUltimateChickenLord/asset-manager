@@ -1,6 +1,6 @@
 [project]
 name = "asset-manager"
-version = "0.1.5"
+version = "0.2.1"
 description = ""
 authors = [
     {name = "TheUltimateChickenLord"}
@@ -18,6 +18,8 @@ packages = [{include = "asset_manager"}]
 
 [tool.poetry.scripts]
 seed = "asset_manager.seed:seed"
+lint = "asset_manager.scripts:lint"
+test = "asset_manager.scripts:test"
 
 [tool.poetry.group.dev.dependencies]
 conventional-commit = ">=0.4.2,<0.5.0"
