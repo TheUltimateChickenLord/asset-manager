@@ -1,6 +1,6 @@
 [project]
 name = "asset-manager"
-version = "0.1.4"
+version = "0.1.5"
 description = ""
 authors = [
     {name = "TheUltimateChickenLord"}
@@ -16,8 +16,12 @@ dependencies = [
 [tool.poetry]
 packages = [{include = "asset_manager"}]
 
+[tool.poetry.scripts]
+seed = "asset_manager.seed:seed"
+
 [tool.poetry.group.dev.dependencies]
 conventional-commit = ">=0.4.2,<0.5.0"
+faker = "^37.1.0"
 pylint = "^3.3.7"
 
 
