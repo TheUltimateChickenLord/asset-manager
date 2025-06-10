@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from asset_manager.core.middleware import LoggingMiddleware
 from asset_manager.db.base import Base
 from asset_manager.db.session import engine
+from asset_manager.routes import auth
 
 
 Base.metadata.create_all(engine)
@@ -20,3 +21,5 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(auth.router)
