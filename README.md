@@ -67,3 +67,19 @@ Pylint (checking code conforms to PEP standards) is run with the following comma
 ```bash
 poetry run lint
 ```
+
+## Current Credentials
+With the database in its current state, the usernames can be seen in the following list, all passwords are set to `Password123!`
+
+| Email                      | Roles                                            |
+| -------------------------- | ------------------------------------------------ |
+| kim62@example.net          | Admin (All roles)                                |
+| yparker@example.org        | Manager (All roles except User management roles) |
+| ymccarthy@example.org      | User (ReadAsset, RequestAsset)                   |
+| davidsoto@example.org      | User (ReadAsset, RequestAsset)                   |
+| rebeccashields@example.org | User (ReadAsset, RequestAsset)                   |
+| carolwells@example.com     | User (ReadAsset, RequestAsset)                   |
+| itravis@example.org        | User (ReadAsset, RequestAsset)                   |
+| kathrynhall@example.com    | User (ReadAsset, RequestAsset)                   |
+| dianaparks@example.org     | User (ReadAsset, RequestAsset)                   |
+| zimmermansusan@example.com | User (ReadAsset, RequestAsset)                   |
