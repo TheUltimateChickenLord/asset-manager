@@ -113,6 +113,17 @@ def create_user(
     label_repo = LabelRepository(db)
     label_mapping_repo = LabelMappingUserRepository(db)
 
+    if repo.get_by_email(data.email):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email must be Unique",
+        )
+    if repo.get_by_name(data.name):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Name must be Unique",
+        )
+
     labels = [label_repo.get_by_name(label_name) for label_name in data.labels]
     if any(label is None for label in labels):
         raise HTTPException(

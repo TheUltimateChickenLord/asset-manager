@@ -79,7 +79,7 @@ def create_label(
         "select",
         "labels",
         current_user.email,
-        f"Tried to create label {label.id} but it already exited",
+        f"Tried to create label {label.id} but it already existed",
     )
     return cast_to_pydantic(label, LabelSchema)
 
