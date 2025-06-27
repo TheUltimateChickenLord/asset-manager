@@ -87,6 +87,12 @@ def create_asset(
     label_repo = LabelRepository(db)
     label_mapping_repo = LabelMappingAssetRepository(db)
 
+    if repo.get_by_asset_tag(asset.asset_tag):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Asset Tag must be Unique",
+        )
+
     labels = [label_repo.get_by_name(label_name) for label_name in asset.labels]
     if any(label is None for label in labels):
         raise HTTPException(
@@ -187,6 +193,13 @@ def update_asset(
     """Update the information about an asset in the database"""
     repo = AssetRepository(db)
     asset = asset_exists(asset_id, repo)
+
+    if data.asset_tag and data.asset_tag != asset.asset_tag:
+        if repo.get_by_asset_tag(data.asset_tag):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Asset Tag must be Unique",
+            )
 
     labels = [label.name for label in asset.labels]
     if not has_role(current_user, "CreateEditAsset", labels):

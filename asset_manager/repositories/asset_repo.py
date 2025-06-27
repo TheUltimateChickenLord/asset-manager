@@ -29,6 +29,13 @@ class AssetRepository(AbstractCRUDRepo[Asset]):
 
         return self.db.query(Asset).filter(*filters).all()
 
+    def get_by_asset_tag(
+        self,
+        tag: str,
+    ) -> Optional[Asset]:
+        """Get asset by its tag"""
+        return self.db.query(Asset).filter(Asset.asset_tag == tag).first()
+
     def get_due_for_maintenance(
         self, subquery: Optional[ColumnExpressionArgument[bool]] = None
     ) -> list[Asset]:
