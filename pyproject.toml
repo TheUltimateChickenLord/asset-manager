@@ -1,6 +1,6 @@
 [project]
 name = "asset-manager"
-version = "0.4.0"
+version = "0.5.0"
 description = ""
 authors = [
     {name = "TheUltimateChickenLord"}
@@ -25,14 +25,13 @@ lint = "asset_manager.scripts:lint"
 test = "asset_manager.scripts:test"
 
 [tool.poetry.group.dev.dependencies]
-conventional-commit = ">=0.4.2,<0.5.0"
 faker = "^37.1.0"
-pylint = "^3.3.7"
-
 
 [tool.poetry.group.test.dependencies]
+pylint = "^3.3.7"
 pytest = "^8.3.5"
 httpx = "^0.28.1"
+pytest-cov = "^7.0.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
