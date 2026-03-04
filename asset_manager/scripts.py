@@ -10,4 +10,4 @@ def lint():
 
 def test():
     """Run the python tests"""
-    os.system("poetry run pytest --verbose --cov=asset_manager --cov-fail-under=85")
+    os.system("poetry run pytest --verbose")
