@@ -82,8 +82,7 @@ jobs:
 
     steps:
       - name: Deploy
+        env:
+          deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: |
-          curl -X POST \
-          -H "Accept: application/json" \
-          -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-          https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploysname: CI/CD Pipeline
+          curl "$deploy_url"
