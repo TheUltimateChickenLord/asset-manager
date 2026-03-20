@@ -23,7 +23,6 @@ from asset_manager.schemas.labels import (
     LabelSchema,
     CreateLabelSchema,
 )
-from asset_manager.schemas.cast import cast_to_pydantic
 
 
 router = APIRouter(tags=["Labels"])
@@ -44,7 +43,7 @@ def get_labels(db: DependsDB, current_user: CurrentActiveUser) -> list[LabelSche
     """Gets all the labels in the database"""
     repo = LabelRepository(db)
     log_db_usage("select", "labels", current_user.email, "Accessed all labels")
-    return cast_to_pydantic(repo.get_all(), LabelSchema)
+    return repo.get_all()
 
 
 @router.post("/")
@@ -73,7 +72,7 @@ def create_label(
             current_user.email,
             f"Created new label with name {data.name}",
         )
-        return cast_to_pydantic(repo.create({"name": data.name}), LabelSchema)
+        return repo.create({"name": data.name})
 
     log_db_usage(
         "select",
@@ -81,7 +80,7 @@ def create_label(
         current_user.email,
         f"Tried to create label {label.id} but it already existed",
     )
-    return cast_to_pydantic(label, LabelSchema)
+    return label
 
 
 @router.post("/assign/user/{user_id}/", tags=["Users"])
@@ -114,9 +113,7 @@ def assign_label_to_user(
         f"Assigned label {label.name} to user {user_id}",
     )
 
-    return cast_to_pydantic(
-        repo.create({"item_id": user_id, "label_id": data.label_id}), LabelMappingSchema
-    )
+    return repo.create({"item_id": user_id, "label_id": data.label_id})
 
 
 @router.post("/assign/asset/{asset_id}/", tags=["Assets"])
@@ -149,10 +146,7 @@ def assign_label_to_asset(
         f"Assigned label {label.name} to asset {asset_id}",
     )
 
-    return cast_to_pydantic(
-        repo.create({"item_id": asset_id, "label_id": data.label_id}),
-        LabelMappingSchema,
-    )
+    return repo.create({"item_id": asset_id, "label_id": data.label_id})
 
 
 @router.delete("/assign/user/{user_id}/", tags=["Users"])
@@ -185,7 +179,7 @@ def unassign_label_from_user(
         f"Unassigned label {label_id} from user {user_id}",
     )
 
-    return cast_to_pydantic(repo.delete(mapping), LabelMappingSchema)
+    return repo.delete(mapping)
 
 
 @router.delete("/assign/asset/{asset_id}/", tags=["Assets"])
@@ -218,7 +212,7 @@ def unassign_label_from_asset(
         f"Unassigned label {label_id} from asset {asset_id}",
     )
 
-    return cast_to_pydantic(repo.delete(mapping), LabelMappingSchema)
+    return repo.delete(mapping)
 
 
 @router.get("/{label_id}/")
@@ -232,4 +226,4 @@ def get_label(
 
     log_db_usage("select", "assets", current_user.email, f"Accessed label {label.name}")
 
-    return cast_to_pydantic(label, LabelSchema)
+    return label

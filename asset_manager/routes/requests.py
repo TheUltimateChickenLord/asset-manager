@@ -22,7 +22,6 @@ from asset_manager.schemas.request import (
     CreateRequestSchema,
     RequestUpdateSchema,
 )
-from asset_manager.schemas.cast import cast_to_pydantic
 
 
 router = APIRouter(tags=["Requests"])
@@ -49,7 +48,7 @@ def get_all_requests_to_approve(
 
     if role_repo.has_scope_all(current_user.id, "CheckInOutAsset"):
         log_db_usage("select", "requests", current_user.email, "Accessed all requests")
-        return cast_to_pydantic(repo.get_all(), RequestSchema)
+        return repo.get_all()
 
     roles = [
         role.scope for role in role_repo.get_roles(current_user.id, "CheckInOutAsset")
@@ -62,10 +61,7 @@ def get_all_requests_to_approve(
 
     log_db_usage("select", "requests", current_user.email, "Accessed all requests")
 
-    return cast_to_pydantic(
-        repo.get_all(subquery=get_requests_by_labels(get_labels_by_roles(db, roles))),
-        RequestSchema,
-    )
+    return repo.get_all(subquery=get_requests_by_labels(get_labels_by_roles(db, roles)))
 
 
 @router.post("/approve/")
@@ -107,7 +103,7 @@ def approve_request(
         "update", "requests", current_user.email, f"Approved request {request_model.id}"
     )
 
-    return cast_to_pydantic(updated_request, RequestSchema)
+    return updated_request
 
 
 @router.post("/reject/")
@@ -137,11 +133,8 @@ def reject_request(
         "update", "requests", current_user.email, f"Rejected request {request_model.id}"
     )
 
-    return cast_to_pydantic(
-        repo.update(
-            request_model, {"status": "Rejected", "approved_by": current_user.id}
-        ),
-        RequestSchema,
+    return repo.update(
+        request_model, {"status": "Rejected", "approved_by": current_user.id}
     )
 
 
@@ -152,10 +145,7 @@ def get_my_requests(
     """Get all my requests that the current user has submitted"""
     repo = RequestRepository(db)
     log_db_usage("select", "requests", current_user.email, "Accessed their requests")
-    return cast_to_pydantic(
-        repo.get_requests_by_user(current_user.id),
-        RequestSchema,
-    )
+    return repo.get_requests_by_user(current_user.id)
 
 
 @router.post("/")
@@ -184,9 +174,7 @@ def submit_request(
         f"Submitted request with info {json.dumps(data.model_dump(), default=str)}",
     )
 
-    return cast_to_pydantic(
-        repo.create({**data.model_dump(), "user_id": current_user.id}), RequestSchema
-    )
+    return repo.create({**data.model_dump(), "user_id": current_user.id})
 
 
 @router.get("/{request_id}/")
@@ -212,4 +200,4 @@ def get_request(
         "select", "requests", current_user.email, f"Accessed request {request.id}"
     )
 
-    return cast_to_pydantic(request, RequestSchema)
+    return request

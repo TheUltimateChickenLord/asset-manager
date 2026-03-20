@@ -27,7 +27,6 @@ from asset_manager.schemas.asset import (
     LinkedAssetSchema,
     UpdateAssetSchema,
 )
-from asset_manager.schemas.cast import cast_to_pydantic
 
 
 router = APIRouter(tags=["Assets"])
@@ -51,7 +50,7 @@ def get_assets(db: DependsDB, current_user: CurrentActiveUser) -> list[AssetSche
 
     if role_repo.has_scope_all(current_user.id, "ReadAsset"):
         log_db_usage("select", "assets", current_user.email, "Accessed all assets")
-        return cast_to_pydantic(repo.get_all(), AssetSchema)
+        return repo.get_all()
 
     roles = [role.scope for role in role_repo.get_roles(current_user.id, "ReadAsset")]
     if len(roles) == 0:
@@ -61,10 +60,7 @@ def get_assets(db: DependsDB, current_user: CurrentActiveUser) -> list[AssetSche
 
     log_db_usage("select", "assets", current_user.email, "Accessed all assets")
 
-    return cast_to_pydantic(
-        repo.get_all(subquery=get_assets_by_labels(get_labels_by_roles(db, roles))),
-        AssetSchema,
-    )
+    return repo.get_all(subquery=get_assets_by_labels(get_labels_by_roles(db, roles)))
 
 
 @router.post("/")
@@ -121,7 +117,7 @@ def create_asset(
             f"Mapped asset {created_asset.id} to label {label.id}",  # type: ignore
         )
 
-    return cast_to_pydantic(created_asset, AssetSchema)
+    return created_asset
 
 
 @router.get("/status/")
@@ -140,7 +136,7 @@ def get_assets_by_status(
             current_user.email,
             f"Accessed all assets with status {asset_status}",
         )
-        return cast_to_pydantic(repo.get_by_status(asset_status), AssetSchema)
+        return repo.get_by_status(asset_status)
 
     roles = [role.scope for role in role_repo.get_roles(current_user.id, "ReadAsset")]
     if len(roles) == 0:
@@ -155,11 +151,8 @@ def get_assets_by_status(
         f"Accessed all assets with status {asset_status}",
     )
 
-    return cast_to_pydantic(
-        repo.get_by_status(
-            asset_status, subquery=get_assets_by_labels(get_labels_by_roles(db, roles))
-        ),
-        AssetSchema,
+    return repo.get_by_status(
+        asset_status, subquery=get_assets_by_labels(get_labels_by_roles(db, roles))
     )
 
 
@@ -180,7 +173,7 @@ def get_asset(
 
     log_db_usage("select", "assets", current_user.email, f"Accessed asset {asset_id}")
 
-    return cast_to_pydantic(asset, AssetSchema)
+    return asset
 
 
 @router.put("/{asset_id}/")
@@ -215,10 +208,7 @@ def update_asset(
         f"Updated asset {asset_id} with info {json.dumps(data.model_dump(), default=str)}",
     )
 
-    return cast_to_pydantic(
-        repo.update(asset, {k: v for k, v in data.model_dump().items() if v}),
-        AssetSchema,
-    )
+    return repo.update(asset, {k: v for k, v in data.model_dump().items() if v})
 
 
 @router.delete("/{asset_id}/")
@@ -242,7 +232,7 @@ def delete_asset(
         "delete", "assets", current_user.email, f"Soft deleted asset {asset_id}"
     )
 
-    return cast_to_pydantic(repo.delete(asset), AssetSchema)
+    return repo.delete(asset)
 
 
 @router.post("/{asset_id}/link/")
@@ -276,11 +266,8 @@ def link_assets(
         f"Linked assets {asset1.id} and {asset2.id} with relation {config.relation}",
     )
 
-    return cast_to_pydantic(
-        linked_repo.create(
-            {"asset_id": asset1.id, "linked_id": asset2.id, "relation": config.relation}
-        ),
-        LinkedAssetSchema,
+    return linked_repo.create(
+        {"asset_id": asset1.id, "linked_id": asset2.id, "relation": config.relation}
     )
 
 
@@ -321,4 +308,4 @@ def unlink_assets(
         f"Unlinked assets {asset1.id} and {asset2.id}",
     )
 
-    return cast_to_pydantic(linked_repo.delete(link), LinkedAssetSchema)
+    return linked_repo.delete(link)

@@ -1,0 +1,6 @@
+[run]
+branch = True
+omit = asset_manager/start.py,asset_manager/seed.py,asset_manager/scripts.py
+
+[report]
+fail_under = 85

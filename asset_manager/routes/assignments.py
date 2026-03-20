@@ -22,7 +22,6 @@ from asset_manager.schemas.assignments import (
     CheckOutAssetSchema,
     RequestReturnSchema,
 )
-from asset_manager.schemas.cast import cast_to_pydantic
 
 
 router = APIRouter(tags=["Assignments"])
@@ -65,10 +64,7 @@ def check_in_asset_by_asset_id(
         f"Updated asset assignment {assignment.id} returned_at",
     )
 
-    return cast_to_pydantic(
-        assignment_repo.update(assignment, {"returned_at": datetime.now(timezone.utc)}),
-        AssetAssignmentSchema,
-    )
+    return assignment_repo.update(assignment, {"returned_at": datetime.now(timezone.utc)})
 
 
 @router.post("/check-in/{asset_assignment_id}/", tags=["Assets"])
@@ -111,10 +107,7 @@ def check_in_asset_by_assignment_id(
         f"Updated asset assignment {assignment.id} returned_at",
     )
 
-    return cast_to_pydantic(
-        assignment_repo.update(assignment, {"returned_at": datetime.now(timezone.utc)}),
-        AssetAssignmentSchema,
-    )
+    return assignment_repo.update(assignment, {"returned_at": datetime.now(timezone.utc)})
 
 
 @router.post("/check-out/", tags=["Assets"])
@@ -156,10 +149,7 @@ def check_out_asset(
         f"Created asset assignment {assignment.id} with info {json.dumps(data, default=str)}",
     )
 
-    return cast_to_pydantic(
-        assignment,
-        AssetAssignmentSchema,
-    )
+    return assignment
 
 
 @router.post("/check-out/{request_id}/", tags=["Assets"])
@@ -212,10 +202,7 @@ def check_out_request(
         f"Created asset assignment {assignment.id} with info {json.dumps(data, default=str)}",
     )
 
-    return cast_to_pydantic(
-        assignment,
-        AssetAssignmentSchema,
-    )
+    return assignment
 
 
 @router.get("/my/")
@@ -231,7 +218,7 @@ def get_my_assignments(
         current_user.email,
         "Accessed all assignments related to them",
     )
-    return cast_to_pydantic(repo.get_by_user(current_user.id), AssetAssignmentSchema)
+    return repo.get_by_user(current_user.id)
 
 
 @router.put("/request-return/")
@@ -262,9 +249,7 @@ def request_assignment_return(
         f"Updated return date of {asset_assignment.id} to {due_date.isoformat()}",
     )
 
-    return cast_to_pydantic(
-        repo.update(asset_assignment, {"due_date": due_date}), AssetAssignmentSchema
-    )
+    return repo.update(asset_assignment, {"due_date": due_date})
 
 
 @router.get("/overdue/", tags=["Assets"])
@@ -281,9 +266,7 @@ def get_overdue(
         current_user.email,
         f"Accessed all assignments due in the next {due_in_days} days related to them",
     )
-    return cast_to_pydantic(
-        repo.get_overdue(current_user.id, due_in_days), AssetAssignmentSchema
-    )
+    return repo.get_overdue(current_user.id, due_in_days)
 
 
 @router.get("/{assignment_id}/")
@@ -313,4 +296,4 @@ def get_assignment_by_id(
         current_user.email,
         f"Accessed assignment with id {assignment_id}",
     )
-    return cast_to_pydantic(assignment, AssetAssignmentSchema)
+    return assignment
