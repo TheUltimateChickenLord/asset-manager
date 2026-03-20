@@ -1,5 +1,7 @@
 """FastAPI app for asset_manager"""
 
+from typing import Literal
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -39,3 +41,9 @@ app.include_router(requests.router, prefix="/api/requests")
 app.include_router(assignments.router, prefix="/api/assignments")
 app.include_router(labels.router, prefix="/api/labels")
 app.include_router(maintenance.router, prefix="/api/maintenance")
+
+
+@app.get("/health", tags=["Health"])
+async def health() -> Literal["Success"]:
+    """Health check endpoint"""
+    return "Success"
