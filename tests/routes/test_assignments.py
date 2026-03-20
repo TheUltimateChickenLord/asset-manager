@@ -27,7 +27,9 @@ client = TestClient(main.app)
 def set_env_vars(monkeypatch: pytest.MonkeyPatch):
     """Fixture to set the database to an in-memory SQLite database for testing"""
     monkeypatch.setenv("SQLALCHEMY_DATABASE_URL", "sqlite:///./tests/data/test.db")
-    monkeypatch.setenv("SECRET_KEY", "testsecret")
+    monkeypatch.setenv(
+        "SECRET_KEY", "TEST_SECRET_TEST_SECRET_TEST_SECRET_TEST_SECRET_TEST_SECRET"
+    )
     monkeypatch.setenv("ALGORITHM", "HS256")
     monkeypatch.setenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1")
     monkeypatch.setenv("LOG_DIR", "tests/logs")

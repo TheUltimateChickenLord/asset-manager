@@ -11,7 +11,9 @@ from tests.data.reload import reload_all_modules
 class TestSecurity:
     @pytest.fixture(autouse=True)
     def set_env_vars(self, monkeypatch: pytest.MonkeyPatch):
-        monkeypatch.setenv("SECRET_KEY", "testsecret")
+        monkeypatch.setenv(
+            "SECRET_KEY", "TEST_SECRET_TEST_SECRET_TEST_SECRET_TEST_SECRET_TEST_SECRET"
+        )
         monkeypatch.setenv("ALGORITHM", "HS256")
         monkeypatch.setenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1")
         monkeypatch.setenv("LOG_DIR", "tests/logs")

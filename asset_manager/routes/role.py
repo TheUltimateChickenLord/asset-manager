@@ -11,7 +11,6 @@ from asset_manager.repositories.label_repo import LabelRepository
 from asset_manager.repositories.role_repo import RoleRepository, roles
 from asset_manager.repositories.user_repo import UserRepository
 from asset_manager.routes.user import user_exists
-from asset_manager.schemas.cast import cast_to_pydantic
 from asset_manager.schemas.role import RoleSchema
 
 
@@ -45,7 +44,7 @@ def get_roles_for_user(
         "select", "roles", current_user.email, f"Accessed user {user_id} roles"
     )
 
-    return cast_to_pydantic(repo.get_roles_by_user_id(user_id), RoleSchema)
+    return repo.get_roles_by_user_id(user_id)
 
 
 @router.post("/user/{user_id}/", tags=["Users"])
@@ -89,10 +88,7 @@ def assign_role(
         f"Assigned role {role.role} with scope {role.scope} to user {user_id}",
     )
 
-    return cast_to_pydantic(
-        repo.create({"user_id": user_id, "scope": role.scope, "role": role.role}),
-        RoleSchema,
-    )
+    return repo.create({"user_id": user_id, "scope": role.scope, "role": role.role})
 
 
 @router.delete("/user/{user_id}/", tags=["Users"])
@@ -128,4 +124,4 @@ def delete_role(
         f"Unassigned role {role} with scope {scope} to user {user_id}",
     )
 
-    return cast_to_pydantic(repo.delete(role_obj), RoleSchema)
+    return repo.delete(role_obj)

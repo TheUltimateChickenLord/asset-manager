@@ -16,7 +16,6 @@ from asset_manager.repositories.asset_repo import AssetRepository
 from asset_manager.repositories.role_repo import RoleRepository
 from asset_manager.routes.assets import asset_exists
 from asset_manager.schemas.asset import AssetSchema
-from asset_manager.schemas.cast import cast_to_pydantic
 from asset_manager.schemas.maintenance import MaintainAssetSchema
 
 
@@ -52,10 +51,7 @@ def check_out_asset_for_maintenance(
         f"Updated asset {asset.id} status to 'Maintenance'",
     )
 
-    return cast_to_pydantic(
-        asset,
-        AssetSchema,
-    )
+    return asset
 
 
 @router.post("/check-in/", tags=["Assets"])
@@ -90,10 +86,7 @@ def check_in_asset_from_maintenance(
         f"Updated asset {asset.id} status to 'Available' and last_maintenance to current time",
     )
 
-    return cast_to_pydantic(
-        asset,
-        AssetSchema,
-    )
+    return asset
 
 
 @router.get("/due/", tags=["Assets"])
@@ -111,7 +104,7 @@ def assets_due_for_maintenance(
             current_user.email,
             "Accessed all assets due for maintenance",
         )
-        return cast_to_pydantic(repo.get_due_for_maintenance(), AssetSchema)
+        return repo.get_due_for_maintenance()
 
     roles = [role.scope for role in role_repo.get_roles(current_user.id, "ReadAsset")]
     if len(roles) == 0:
@@ -127,9 +120,6 @@ def assets_due_for_maintenance(
         "Accessed all assets due for maintenance",
     )
 
-    return cast_to_pydantic(
-        repo.get_due_for_maintenance(
-            subquery=get_assets_by_labels(get_labels_by_roles(db, roles))
-        ),
-        AssetSchema,
+    return repo.get_due_for_maintenance(
+        subquery=get_assets_by_labels(get_labels_by_roles(db, roles))
     )

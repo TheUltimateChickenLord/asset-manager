@@ -20,7 +20,6 @@ from asset_manager.repositories.label_mapping_repo import LabelMappingUserReposi
 from asset_manager.repositories.label_repo import LabelRepository
 from asset_manager.repositories.role_repo import RoleRepository
 from asset_manager.repositories.user_repo import UserRepository
-from asset_manager.schemas.cast import cast_to_pydantic
 from asset_manager.schemas.user import (
     CreateUserSchema,
     ResetPasswordSchema,
@@ -49,7 +48,7 @@ def get_users(db: DependsDB, current_user: CurrentActiveUser) -> list[UserSchema
 
     if role_repo.has_scope_all(current_user.id, "ReadUser"):
         log_db_usage("select", "users", current_user.email, "Accessed all users")
-        return cast_to_pydantic(repo.get_all(), UserSchema)
+        return repo.get_all()
 
     roles = [role.scope for role in role_repo.get_roles(current_user.id, "ReadUser")]
     if len(roles) == 0:
@@ -59,17 +58,14 @@ def get_users(db: DependsDB, current_user: CurrentActiveUser) -> list[UserSchema
 
     log_db_usage("select", "users", current_user.email, "Accessed all users")
 
-    return cast_to_pydantic(
-        repo.get_all(subquery=get_users_by_labels(get_labels_by_roles(db, roles))),
-        UserSchema,
-    )
+    return repo.get_all(subquery=get_users_by_labels(get_labels_by_roles(db, roles)))
 
 
 @router.get("/me/")
 def get_myself(current_user: CurrentActiveUserPasswordResetRoutes) -> UserSchema:
     """Gets the information about the user who is currently logged in"""
     log_db_usage("select", "users", current_user.email, "Accessed themselves")
-    return cast_to_pydantic(current_user, UserSchema)
+    return current_user
 
 
 @router.get("/{user_id}/")
@@ -90,7 +86,7 @@ def get_user(
 
     log_db_usage("select", "users", current_user.email, f"Accessed user {user_id}")
 
-    return cast_to_pydantic(user, UserSchema)
+    return user
 
 
 @router.post("/")
@@ -164,10 +160,7 @@ def create_user(
             f"Mapped user {user.id} to label {label.id}",  # type: ignore
         )
 
-    return cast_to_pydantic(
-        user,
-        UserSchema,
-    )
+    return user
 
 
 @router.put("/reset-password/")
@@ -205,7 +198,7 @@ def enable_user(
 
     log_db_usage("update", "users", current_user.email, f"Enabled user {user.id}")
 
-    return cast_to_pydantic(repo.enable_user(user), UserSchema)
+    return repo.enable_user(user)
 
 
 @router.delete("/{user_id}/")
@@ -233,7 +226,7 @@ def delete_user(
 
         log_db_usage("update", "users", current_user.email, f"Disabled user {user.id}")
 
-        return cast_to_pydantic(repo.disable_user(user), UserSchema)
+        return repo.disable_user(user)
 
     if not has_role(current_user, "DeleteUser", labels):
         raise HTTPException(
@@ -243,7 +236,7 @@ def delete_user(
 
     log_db_usage("delete", "users", current_user.email, f"Soft deleted user {user.id}")
 
-    return cast_to_pydantic(repo.delete(user), UserSchema)
+    return repo.delete(user)
 
 
 @router.put("/{user_id}/reset-password/")
